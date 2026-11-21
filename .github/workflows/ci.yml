@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npx tsc --noEmit
+      - run: npm test
+      - run: npm run build
+
+  database:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx --yes supabase@3.2.0 start --agent no --exclude storage-api,imgproxy,studio,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta
+      - run: npx --yes supabase@3.2.0 test db
+      - name: Load local test credentials
+        shell: bash
+        run: |
+          source <(npx --yes supabase@3.2.0 status --output env)
+          {
+            printf 'SUPABASE_URL=%s\n' "$API_URL"
+            printf 'SUPABASE_ANON_KEY=%s\n' "$ANON_KEY"
+            printf 'SUPABASE_SERVICE_ROLE_KEY=%s\n' "$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+      - run: npm run test:concurrency
+      - if: always()
+        run: npx --yes supabase@3.2.0 stop --no-backup

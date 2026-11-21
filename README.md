@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bunot-Bunot
 
-## Getting Started
+A public Paskong Pinoy bunutan. Visitors can create a session without an account, add names, draw in a transaction-safe round, and share a read-only party display.
 
-First, run the development server:
+## Run locally
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Install Node.js 20.9 or newer and Docker Desktop.
+2. Install packages with `npm ci`.
+3. Start local Supabase: `npx supabase start --agent no --exclude storage-api,imgproxy,studio,edge-runtime,logflare,vector,supavisor,realtime,postgres-meta`.
+4. Copy `.env.example` to `.env.local`. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from local Supabase status. Create a random `RATE_LIMIT_SECRET` of at least 32 bytes. Set `SUPABASE_ANON_KEY` too when running the browser-permission integration check. Keep the service-role key server-only.
+5. Apply the database: `npx supabase db reset` (local only).
+6. Run `npm run dev` and open `http://localhost:3000`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Checks
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+- `npx supabase test db`
+- `npm run test:concurrency` (requires local Supabase credentials in the environment)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Production setup
 
-## Learn More
+Deploy the repository to Vercel and create a dedicated Supabase project. Configure `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel. Vercel's forwarded client-IP header is used for rate limits; on another host, set `TRUSTED_CLIENT_IP_HEADER` to a header overwritten by its trusted proxy. Apply all checked-in migrations to that dedicated project before publishing. The service-role key must never use a `NEXT_PUBLIC_` name or reach browser code.
 
-To learn more about Next.js, take a look at the following resources:
+This checkout has no Bunot GitHub remote, hosted Supabase project, or Vercel deployment. It is not yet a public website. See `docs/PROJECT_STATUS.md` for the remaining setup.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `docs/` for product, design, architecture, database, security, API, and test details.

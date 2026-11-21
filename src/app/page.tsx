@@ -1,69 +1,54 @@
-import Image from "next/image";
+import { ArrowDown, ArrowUpRight, ListOrdered, UsersRound } from 'lucide-react'
+import Link from 'next/link'
+import { CreateSessionButton } from '@/components/session-controls'
+import { ParolMark } from '@/components/parol-mark'
+import { getLastSessionId } from '@/lib/session'
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+const steps = [
+  { number: '01', icon: UsersRound, title: 'Gather your people', description: 'Add names one by one or paste in your guest list.' },
+  { number: '02', icon: ListOrdered, title: 'Set the moment', description: 'Bring everyone together for a simple, easy-to-follow draw.' },
+  { number: '03', icon: ArrowUpRight, title: 'Reveal and celebrate', description: 'Let the name appear, share the cheer, and keep the party moving.' },
+]
+
+export default async function Home() {
+  const lastSessionId = await getLastSessionId()
+  return <>
+    <header className="site-header">
+      <div className="header-inner">
+        <Link className="brand" href="/" aria-label="Bunot-Bunot home"><ParolMark className="brand-mark" /><span>Bunot<span className="brand-dash">—</span>Bunot</span></Link>
+        <nav className="main-nav" aria-label="Main navigation"><Link href="/">Home</Link><a href="#how-it-works">How it works</a><a href="#about">About</a></nav>
+        <CreateSessionButton className="button button-small button-light" />
+      </div>
+    </header>
+
+    <main>
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero-inner">
+          <div className="hero-copy">
+            <p className="eyebrow"><span aria-hidden="true">✳</span> Paskong Pinoy edition</p>
+            <h1 id="hero-title">Bring the glow of Pasko to your <em>bunutan.</em></h1>
+            <p className="hero-description">Gather your guest list, let the room hold its breath, and reveal one name at a time.</p>
+            <div className="hero-actions"><CreateSessionButton /><a className="text-link" href="#how-it-works">See how it works <ArrowDown aria-hidden="true" size={16} /></a></div>
+            <p className="hero-note"><span className="note-rule" /> No account. Just names, parols, and Pasko.</p>
+            {lastSessionId && <Link className="resume-link" href={`/sessions/${lastSessionId}`}>Resume your last bunutan <ArrowUpRight size={15} /></Link>}
+          </div>
+          <div className="hero-art" aria-hidden="true">
+            <div className="art-halo" /><div className="light-string light-string-one"><i /><i /><i /><i /><i /></div><div className="light-string light-string-two"><i /><i /><i /><i /></div>
+            <ParolMark className="parol-small parol-small-left" /><ParolMark className="parol-small parol-small-right" /><ParolMark className="parol-main" />
+            <div className="street-line" /><p className="art-caption"><span>01</span> THE NAMES GATHER. THE PAROL GLOWS.</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+        <a className="scroll-cue" href="#how-it-works" aria-label="Scroll to how it works"><span /></a>
+      </section>
+
+      <section className="how-section" id="how-it-works" aria-labelledby="how-title">
+        <div className="section-heading"><p className="eyebrow eyebrow-dark"><span aria-hidden="true">✳</span> A little ritual, made easy</p><h2 id="how-title">From a list of names<br />to a room full of cheers.</h2><p className="section-intro">Keep the setup simple, so the best part can take center stage.</p></div>
+        <ol className="steps-list">{steps.map(({ number, icon: Icon, title, description }) => <li className="step" key={number}><div className="step-topline"><span className="step-number">{number}</span><Icon className="step-icon" aria-hidden="true" size={22} strokeWidth={1.6} /></div><h3>{title}</h3><p>{description}</p></li>)}</ol>
+      </section>
+
+      <section className="closing-cta" id="about" aria-labelledby="closing-title"><ParolMark className="closing-mark" /><div><p className="eyebrow"><span aria-hidden="true">✳</span> Let the good names roll</p><h2 id="closing-title">Ready to bring everyone into the moment?</h2></div><CreateSessionButton /></section>
+    </main>
+
+    <footer className="site-footer"><Link className="brand footer-brand" href="/" aria-label="Bunot-Bunot home"><ParolMark className="brand-mark" /><span>Bunot<span className="brand-dash">—</span>Bunot</span></Link><p>A brighter little tradition for your Christmas gathering.</p><a href="#how-it-works">How it works <ArrowUpRight aria-hidden="true" size={14} /></a></footer>
+  </>
 }
