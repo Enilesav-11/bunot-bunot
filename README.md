@@ -24,7 +24,7 @@ A public Paskong Pinoy bunutan. Visitors can create a session without an account
 
 Deploy the repository to Vercel and create a dedicated Supabase project. Configure `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel. Vercel's forwarded client-IP header is used for rate limits; on another host, set `TRUSTED_CLIENT_IP_HEADER` to a header overwritten by its trusted proxy. Apply all checked-in migrations to that dedicated project before publishing. The service-role key must never use a `NEXT_PUBLIC_` name or reach browser code.
 
-This checkout has no Bunot GitHub remote, hosted Supabase project, or Vercel deployment. It is not yet a public website. See `docs/PROJECT_STATUS.md` for the remaining setup.
+The source is in the private [GitHub repository](https://github.com/Enilesav-11/bunot-bunot). A hosted Supabase project and Vercel deployment are still pending, so this is not yet a public website. See `docs/PROJECT_STATUS.md` for the blockers and remaining setup.
 
 ## Project notes
 
