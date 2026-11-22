@@ -1,6 +1,6 @@
 # Verification plan and results
 
-**Status:** local checks and hosted database smoke checks pass. The live website's database-backed flow remains unverified.
+**Status:** local, hosted database, and core production browser checks pass; recovery, live isolation, device layout, and scheduled cron remain unverified.
 
 ## Automated checks
 
@@ -12,6 +12,7 @@
 | Lint and TypeScript | App source | Passed |
 | Production build | Next.js optimized build | Passed |
 | Hosted Supabase smoke | Session isolation, 20 unique draws, completion/public projection, recovery-code rotation and invalidation | Passed; temporary records removed |
+| Vercel production browser | Anonymous session, three unique draws, refresh persistence, independent read-only party display | Passed at commit `1bc352b`; temporary session and results deleted |
 
 ## Browser journey completed locally
 
@@ -23,14 +24,14 @@
 
 ## Live site check
 
-- `https://bunot-bunot-lemon.vercel.app` responds with HTTP 200 and the Bunot landing page.
+- `https://bunot-bunot-lemon.vercel.app` serves the public landing page and creates bunutans without sign-in.
+- Three live participants were each drawn once; the round completed at zero remaining and survived refresh.
+- An independent Edge browser displayed the latest result and remaining count with no management controls. The temporary session was deleted afterward; its public link no longer resolves.
 - `/api/cron/purge` returns 401 without a valid bearer secret.
 - GitHub Actions `app` and `database` checks pass for the published recovery branch. Its Vercel Preview requires Vercel login and is not publicly accessible.
-- No live bunutan was created because Vercel's Supabase server credentials are inaccessible for verification; whether they are configured is unknown.
 
 ## Not verified yet
 
-- Live session creation, drawing, recovery, refresh, public presentation, cross-browser isolation, and HTTPS cookies.
-- Actual Vercel cron execution and runtime logs.
+- Live recovery in a second browser, cross-session isolation, HTTPS cookie attributes, scheduled Vercel cron execution, and runtime logs.
 - Phone/tablet visual layout and projector fullscreen in an independent browser.
 - Preview journey outside the Vercel-authenticated project context.

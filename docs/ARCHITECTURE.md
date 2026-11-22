@@ -29,6 +29,6 @@ The browser's latest session ID and the management capability are held in separa
 
 ## Deployment and verification
 
-The source is in the public GitHub repository and `https://bunot-bunot-lemon.vercel.app` serves the landing page. The active production Supabase project has all four checked-in migrations applied. Confirm `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel Production; add any missing values. Do not claim the bunutan workflow is production-ready until it is deployed and verified.
+The source is in the public GitHub repository. Vercel Production at `https://bunot-bunot-lemon.vercel.app` runs from `feat/anonymous-bunutan-platform` at commit `1bc352b`, with all four runtime variables configured. The active production Supabase project has all four checked-in migrations applied.
 
-Verification: 22 pgTAP checks, a 20-request concurrent-draw integration test, lint, TypeScript, unit tests, and the production build pass locally. A hosted Supabase transaction smoke test passed 20 unique draws, session isolation, public projection, and recovery-code rotation; test data was removed. The website's database-backed workflow and cron execution are not verified through Vercel.
+Verification: 22 pgTAP checks, a 20-request concurrent-draw integration test, lint, TypeScript, unit tests, and the production build pass locally. A hosted Supabase transaction smoke test passed 20 unique draws, session isolation, public projection, and recovery-code rotation; test data was removed. The Vercel production draw flow and public read-only display passed at commit `1bc352b`; scheduled cron execution remains unverified.

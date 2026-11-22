@@ -1,6 +1,6 @@
 # Bunot-Bunot Acceptance Criteria
 
-**Status:** local anonymous-session implementation; production URL and remaining device/recovery checks are pending.
+**Status:** production URL and core draw flow verified; recovery, live isolation, and device checks remain.
 
 ## Public entry and session creation
 

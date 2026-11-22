@@ -1,6 +1,6 @@
 # Bunot-Bunot User Flows
 
-**Status:** public, account-free flows are implemented locally; cloud deployment remains pending.
+**Status:** public, account-free core flow is live and verified; recovery, live isolation, and device-specific checks remain.
 
 ## Start a bunutan
 

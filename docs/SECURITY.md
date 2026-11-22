@@ -1,6 +1,6 @@
 # Security
 
-**Status:** production Supabase schema and grants are verified. Vercel secrets and the website's live database connection could not be inspected.
+**Status:** production Supabase schema, grants, and Vercel database connection are verified. The previous server key is revoked after rotation.
 
 ## Capability and public access
 
@@ -25,4 +25,4 @@ The server HMACs the trusted forwarded client address; only the derived key is s
 
 Local checks pass: 22 pgTAP assertions, 20-request concurrent drawing integration, lint, TypeScript, unit tests, and production build. Hosted Supabase smoke checks passed session isolation, 20 unique draws, public projection, recovery-code rotation, rejection of the old recovery code, and renewed management access; temporary test rows were removed. Health advisor is clean; the remaining RLS notices are informational because the app is server-only.
 
-The public URL currently serves the landing page, but Vercel's production environment variables are not verified. Session creation, HTTPS cookie behavior, scheduled cron execution, and live browser isolation remain unverified until Vercel is configured and redeployed.
+The live production draw and read-only public display passed from separate browsers; refresh retained all results. The purge endpoint rejects requests without its bearer secret. Still unverified: scheduled cron execution, HTTPS cookie attributes, live cross-session isolation, recovery in a second browser, and production logs. The test session and results were deleted after verification.

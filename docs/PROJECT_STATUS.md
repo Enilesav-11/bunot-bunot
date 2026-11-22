@@ -1,8 +1,8 @@
 # Project status
 
-**Phase:** public landing page live; production bunutan backend not verified through Vercel
+**Phase:** public anonymous bunutan live; production backend verified
 
-**Updated:** 2026-11-22
+**Updated:** 2026-11-23
 
 ## Implemented
 
@@ -20,23 +20,20 @@
 - Local integration test passes session isolation, 20 concurrent unique draws, public projection, and recovery rotation.
 - Local browser smoke flow passed: create session, add duplicate names, draw all participants, and open the public display.
 - Hosted Supabase smoke transaction passed session isolation, 20 unique draws, completed-round/public projection checks, recovery-code rotation, old-code invalidation, and renewed management access. Temporary records were removed.
-- `https://bunot-bunot-lemon.vercel.app` returns HTTP 200 with the Bunot landing page. Unauthorized requests to `/api/cron/purge` return 401 as intended.
+- Production Vercel deployment is Ready at commit `1bc352b` on `feat/anonymous-bunutan-platform`. All four runtime variables are set for Production.
+- Live Vercel flow passed without sign-in: create session, add three names, draw each exactly once, complete the round, refresh, and retain results. An independent Edge browser saw the read-only party display with zero remaining and no management controls. The test session and results were removed afterward.
+- Supabase's production server key was rotated; the previous key was revoked after the live flow passed. No key value is stored in the repository.
+- `https://bunot-bunot-lemon.vercel.app` serves the public site over HTTPS. `GET /api/cron/purge` without a bearer token returns 401 as intended.
 
 ## Hosting and blockers
 
-The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot). Recovery work is published on `codex/production-recovery`; the repository default remains `feat/anonymous-bunutan-platform`. Vercel settings, production environment variables, deployed branch, and deployed commit could not be inspected. The landing page responds, but no production session has been created through the website.
-
-GitHub's `app` and `database` checks passed on the published branch. Vercel produced a Preview deployment, but the URL returns Vercel's login page without project authorization; it is not a public substitute for the production site.
+The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot). Recovery work is published on `codex/production-recovery`; production now tracks `feat/anonymous-bunutan-platform` at `1bc352b`. GitHub's `app` and `database` checks passed on the recovery branch. Vercel Preview remains access-protected; production is public.
 
 The production Supabase project is active in the approved Free organization in Singapore. Hosted checks confirm RLS on all five application tables, no direct table privileges for `anon` or `authenticated`, and `service_role`-only execution for app RPCs. Health advisor is clean. Remaining RLS-without-policy notices are informational for the server-only RPC model; the two remaining unindexed-FK notices have existing leading-column indexes. Unused-index notices are expected on an empty project.
-
-Confirm `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel Production. If any are missing, add them there; copy the service-role key directly from Supabase to Vercel's sensitive environment-variable form. Do not share or commit it. Redeploy after changing variables.
 
 `WARDROBE Production` remains `INACTIVE`. Supabase rejected the restore because the owner has reached the two-active-Free-project limit. No other project was paused and no paid plan was selected. Restoring requires a free active-project slot or owner approval for paid capacity.
 
 ## Remaining checks
 
-- Configure Vercel production variables and redeploy the intended production branch.
-- Verify session creation, participant management, drawing, refresh, recovery, public sharing, isolation, and HTTPS cookies through the live website and an independent browser.
-- Confirm Vercel cron execution, production logs, and mobile/tablet presentation layouts.
-- Confirm the Vercel environment variables and production branch before merging this recovery branch or changing the production deployment.
+- Verify a recovery code in a second browser and isolation between two live sessions.
+- Verify scheduled purge execution, production logs, HTTPS cookie attributes, and phone/tablet/projector layouts.

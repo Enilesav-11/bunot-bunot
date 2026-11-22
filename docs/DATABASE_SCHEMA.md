@@ -1,6 +1,6 @@
 # Database schema
 
-**Status:** all four checked-in migrations are applied to the production Bunot Supabase project. The Next.js production connection remains unconfigured.
+**Status:** all four checked-in migrations are applied to the production Bunot Supabase project. The Vercel production connection is live and verified.
 
 ## Tables
 
@@ -30,4 +30,4 @@ RLS is enabled on every public table. Direct table access and function execution
 - Recovery locks the session, replaces the management verifier, clears the one-time recovery verifier, and restores access. `rotate_bunutan_recovery_code` replaces the recovery verifier and invalidates the previous code.
 - `purge_expired_bunutan_sessions` removes sessions and dependent data once the 60-day recovery deadline passes, then clears old rate-limit buckets.
 
-Local database verification passes 22 pgTAP checks. Hosted checks confirmed the production tables have RLS enabled, direct table access is unavailable to `anon` and `authenticated`, and application RPCs are `service_role` only. A hosted smoke test passed session isolation, 20 unique draws, public projection, and recovery-code rotation; temporary records were cleaned up. Vercel runtime access to this database remains unverified.
+Local database verification passes 22 pgTAP checks. Hosted checks confirmed the production tables have RLS enabled, direct table access is unavailable to `anon` and `authenticated`, and application RPCs are `service_role` only. Hosted smoke tests passed session isolation, unique draws, public projection, and recovery-code rotation. Live Vercel checks passed unique draws, public projection, and refresh persistence. Temporary records were removed.
