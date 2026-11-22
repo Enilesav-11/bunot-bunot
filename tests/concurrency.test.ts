@@ -130,3 +130,99 @@ test('anonymous sessions isolate data and concurrent draws select each participa
     }
   }
 })
+
+test('online exchanges serialize invitation claims and keep concurrent reveals private', async () => {
+  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  assert.ok(url && serviceKey, 'Start local Supabase and provide its URL and service role key.')
+  const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } })
+  const rateKey = hash(randomUUID())
+  const management = randomBytes(32).toString('base64url')
+  const recovery = randomBytes(16).toString('hex')
+  const createdIds: string[] = []
+  const expired = await admin.from('bunutan_sessions').select('id', { count: 'exact', head: true }).lte('recovery_expires_at', new Date().toISOString())
+  if (expired.error) throw expired.error
+  assert.equal(expired.count, 0, 'Run against a clean local database so test cleanup cannot purge unrelated expired sessions.')
+
+  async function create(name: string, capability: string) {
+    const { data, error } = await admin.rpc('create_online_bunutan_session', {
+      p_session_name: name, p_description: null, p_registration_deadline: new Date(Date.now() + 60_000).toISOString(),
+      p_assignment_release_at: new Date(Date.now() + 120_000).toISOString(), p_event_date: null, p_event_timezone: 'Asia/Manila',
+      p_gift_budget: null, p_instructions: null, p_wishlists_enabled: false,
+      p_public_id: randomBytes(32).toString('base64url'), p_management_hash: hash(capability), p_recovery_hash: hash(recovery), p_rate_key: rateKey,
+    })
+    if (error || !data) throw error ?? new Error('Online event creation failed.')
+    createdIds.push(data.session_id)
+    return data.session_id as string
+  }
+
+  try {
+    const sessionId = await create('Concurrent online exchange', management)
+    const otherSessionId = await create('Isolated online exchange', randomBytes(32).toString('base64url'))
+    const isolated = await admin.rpc('get_online_event_dashboard', {
+      p_session_id: otherSessionId, p_capability: management, p_rate_key: rateKey,
+    })
+    assert.ok(isolated.error, 'One organizer capability cannot read another online event.')
+
+    const invitationTokens = [randomBytes(32).toString('base64url'), randomBytes(32).toString('base64url')]
+    const inviteHashes = invitationTokens.map(hash)
+    const { error: addError } = await admin.rpc('add_gift_exchange_invites', {
+      p_session_id: sessionId, p_capability: management, p_rate_key: rateKey,
+      p_names: ['Guest A', 'Guest B'], p_token_hashes: inviteHashes,
+    })
+    if (addError) throw addError
+    const { error: openError } = await admin.rpc('open_bunutan_registration', { p_session_id: sessionId, p_capability: management, p_rate_key: rateKey })
+    if (openError) throw openError
+
+    const portalTokens = [randomBytes(32).toString('base64url'), randomBytes(32).toString('base64url'), randomBytes(32).toString('base64url')]
+    const claimInputs = [
+      { invitation: inviteHashes[0], portal: portalTokens[0] },
+      { invitation: inviteHashes[0], portal: portalTokens[1] },
+      { invitation: inviteHashes[1], portal: portalTokens[2] },
+    ]
+    const claims = await Promise.all(claimInputs.map(({ invitation, portal }) => admin.rpc('claim_gift_invitation', {
+      p_invitation_hash: invitation, p_participant_hash: hash(portal), p_rate_key: rateKey,
+    })))
+    const winners = new Map<string, string>()
+    claims.forEach((claim, index) => { if (!claim.error && claim.data) winners.set(claim.data.participant_id, hash(claimInputs[index].portal)) })
+    assert.equal(winners.size, 2, 'Concurrent duplicate claim has exactly one winner, and the other invitation is independently claimed.')
+    assert.equal(claims.slice(0, 2).filter(claim => !claim.error).length, 1, 'One participant slot cannot be claimed twice.')
+
+    const confirms = await Promise.all([...winners.values()].map(tokenHash => admin.rpc('confirm_gift_participation', {
+      p_token_hash: tokenHash, p_rate_key: rateKey, p_response: 'confirm',
+    })))
+    for (const confirmation of confirms) if (confirmation.error) throw confirmation.error
+    const { error: closeError } = await admin.rpc('close_bunutan_registration', { p_session_id: sessionId, p_capability: management, p_rate_key: rateKey })
+    if (closeError) throw closeError
+    const { error: lockError } = await admin.rpc('lock_gift_roster', { p_session_id: sessionId, p_capability: management, p_rate_key: rateKey })
+    if (lockError) throw lockError
+    const { data: round, error: drawError } = await admin.rpc('generate_gift_assignments', {
+      p_session_id: sessionId, p_capability: management, p_rate_key: rateKey,
+    })
+    if (drawError || !round) throw drawError ?? new Error('Assignment generation failed.')
+    const { error: releaseError } = await admin.from('bunutan_sessions').update({ assignment_release_at: new Date(Date.now() - 1000).toISOString() }).eq('id', sessionId)
+    if (releaseError) throw releaseError
+
+    const reveals = await Promise.all([...winners.values()].map(tokenHash => admin.rpc('reveal_gift_assignment', {
+      p_token_hash: tokenHash, p_rate_key: rateKey,
+    })))
+    for (const reveal of reveals) if (reveal.error || !reveal.data) throw reveal.error ?? new Error('Assignment reveal failed.')
+    assert.equal(reveals.length, 2)
+    assert.ok(reveals.every(reveal => typeof reveal.data.recipient_name === 'string'))
+    assert.ok(reveals.every(reveal => !('assignments' in reveal.data)), 'Reveal responses never include the complete assignment list.')
+    const repeated = await Promise.all([0, 1].map(() => admin.rpc('reveal_gift_assignment', {
+      p_token_hash: [...winners.values()][0], p_rate_key: rateKey,
+    })))
+    for (const reveal of repeated) if (reveal.error || !reveal.data) throw reveal.error ?? new Error('Repeated reveal failed.')
+    assert.equal(repeated[0].data.recipient_name, repeated[1].data.recipient_name, 'Concurrent repeat reveals preserve the saved recipient.')
+  } finally {
+    for (const id of createdIds) {
+      const { error } = await admin.from('bunutan_sessions').update({ expires_at: new Date(0).toISOString(), recovery_expires_at: new Date(0).toISOString() }).eq('id', id)
+      if (error) throw error
+    }
+    if (createdIds.length) {
+      const { error } = await admin.rpc('purge_expired_bunutan_sessions')
+      if (error) throw error
+    }
+  }
+})

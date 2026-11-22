@@ -8,6 +8,7 @@ import { ParticipantList } from '@/components/participant-list'
 import { RecoveryForm, RecoveryCodeControl, SessionEditor, ShareButton, ParticipantImportForm } from '@/components/session-controls'
 import { ResultsTable } from '@/components/results-table'
 import { SessionKeepalive } from '@/components/session-keepalive'
+import { OnlineEventManagement } from '@/components/online-event-management'
 import { getBunutanSession, isUuid } from '@/lib/session'
 
 export default async function SessionPage({ params, searchParams }: PageProps<'/sessions/[sessionId]'>) {
@@ -16,6 +17,18 @@ export default async function SessionPage({ params, searchParams }: PageProps<'/
   if (!isUuid(sessionId)) notFound()
   const data = await getBunutanSession(sessionId)
   if (!data) return <main className="app-shell narrow-shell"><Link className="back-link" href="/"><ArrowLeft size={16} /> Home</Link><section className="form-card"><p className="eyebrow eyebrow-dark">RESTORE A BUNUTAN</p><h1>Welcome back.</h1><p className="page-intro">This browser does not have management access. Enter the recovery code you saved when this bunutan was created.</p><RecoveryForm id={sessionId} /></section></main>
+
+  if(data.session.is_online_event){
+    if(!data.online)notFound()
+    const{session,online}=data
+    return <>
+      <header className="app-header"><div className="app-header-inner"><Link className="brand app-brand" href="/"><ParolMark className="brand-mark"/> Bunot<span className="brand-dash">—</span>Bunot</Link><nav aria-label="Event navigation"><Link href="/">Home</Link><a href={`/e/${session.public_id}`} target="_blank" rel="noreferrer">Public event</a></nav></div></header>
+      <main className="app-shell"><SessionKeepalive id={sessionId}/><Link className="back-link" href="/"><ArrowLeft size={16}/> Home</Link>{query.error==='online'&&<p className="form-message form-error" role="alert">That event change could not be completed. Check the status and try again.</p>}
+        <div className="page-heading-row event-heading"><div><p className="eyebrow eyebrow-dark"><span>✦</span> YOUR ONLINE CHRISTMAS EXCHANGE</p><h1>{session.session_name}</h1><p className="page-intro"><CalendarDays size={16}/> Created {new Date(session.created_at).toLocaleDateString('en-PH',{dateStyle:'long'})}</p></div><div className="heading-actions"><span className="status-pill status-active">{online.session.event_status.replaceAll('_',' ')}</span></div></div>
+        <OnlineEventManagement id={sessionId} data={online}/>
+      </main>
+    </>
+  }
 
   const { session, participants, rounds } = data
   const active = participants.filter((person) => person.status === 'active')

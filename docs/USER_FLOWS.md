@@ -2,6 +2,19 @@
 
 **Status:** public, account-free core flow is live and verified; recovery, live isolation, and device-specific checks remain.
 
+## Remote gift exchange
+
+1. Organizer creates an online event with registration, assignment-release, and optional exchange dates; the device time zone is saved with it.
+2. Organizer opens registration and creates one private invitation link per participant. Links can be copied or reissued; no delivery provider is assumed.
+3. Each participant opens their link, confirms or declines, and can save an optional wishlist from their private portal.
+4. Organizer closes registration and locks the confirmed roster. Pending or declined participants are excluded.
+5. The server creates and validates a complete one-to-one assignment round before any reveal. Database uniqueness and no-self constraints backstop the assignment logic.
+6. After the release time, each participant reveals only their own recipient and can revisit that result from the same browser. The organizer sees progress, never the assignment mapping.
+7. A read-only public event page shows event details and confirmed count. Organizer recovery codes and participant links are separate capabilities.
+
+The complete mapping stays server-side. Assignment release time, registration status, invitation claims, roster lock, and reveal status are checked by database functions on each operation.
+Registration can be reopened before its deadline. After assignments are generated, the organizer can void only an unrevealed round, remove confirmed participants or invite replacements, and generate a complete new round. The voided round remains in history and its participant links are revoked when removed.
+
 ## Start a bunutan
 
 1. Visitor opens the landing page and selects **Start a Bunutan**.

@@ -21,6 +21,14 @@ Draws lock the round, use rejection-sampled `pgcrypto` randomness, and commit re
 
 The server HMACs the trusted forwarded client address; only the derived key is stored. Limits cover session creation, management, public reads, and recovery. Vercel's forwarded client-IP header is used by default. Expired session data is purged by a bearer-protected endpoint scheduled daily in `vercel.json`.
 
+## Online exchange privacy
+
+- Organizer capabilities and participant portal capabilities are random, separate, and stored only as SHA-256 verifiers. Participant cookies are HttpOnly and scoped to `/participant`.
+- Invitation tokens are one-time. The browser sends them in a URL fragment, which is stripped after opening; the site sets `no-referrer` to avoid forwarding sensitive URLs.
+- Assignment rows have unique giver/recipient constraints, a no-self check, and same-session foreign keys. RLS is enabled and direct browser-role table access is revoked; server RPCs return only approved event fields or one participant's own revealed assignment.
+- Organizer dashboard data includes counts and reveal progress, never the complete assignment mapping. A participant's wishlist is returned only to their assigned giver after that giver reveals.
+- Participant operations acquire event and participant locks in a consistent order so claim, confirmation, roster lock, and reveal requests serialize safely.
+
 ## Verification and remaining risk
 
 Local checks pass: 22 pgTAP assertions, 20-request concurrent drawing integration, lint, TypeScript, unit tests, and production build. Hosted Supabase smoke checks passed session isolation, 20 unique draws, public projection, recovery-code rotation, rejection of the old recovery code, and renewed management access; temporary test rows were removed. Health advisor is clean; the remaining RLS notices are informational because the app is server-only.

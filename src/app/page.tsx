@@ -1,13 +1,12 @@
-import { ArrowDown, ArrowUpRight, ListOrdered, UsersRound } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, CalendarDays, ListOrdered, UsersRound } from 'lucide-react'
 import Link from 'next/link'
-import { CreateSessionButton } from '@/components/session-controls'
 import { ParolMark } from '@/components/parol-mark'
 import { getLastSessionId } from '@/lib/session'
 
 const steps = [
-  { number: '01', icon: UsersRound, title: 'Gather your people', description: 'Add names one by one or paste in your guest list.' },
-  { number: '02', icon: ListOrdered, title: 'Set the moment', description: 'Bring everyone together for a simple, easy-to-follow draw.' },
-  { number: '03', icon: ArrowUpRight, title: 'Reveal and celebrate', description: 'Let the name appear, share the cheer, and keep the party moving.' },
+  { number: '01', icon: UsersRound, title: 'Invite your people', description: 'Share one private invitation link with each person, wherever they are.' },
+  { number: '02', icon: ListOrdered, title: 'Lock the guest list', description: 'Everyone confirms on their own time before the assignments are made.' },
+  { number: '03', icon: ArrowUpRight, title: 'Reveal in private', description: 'Each person returns when ready and sees only the recipient they are gifting.' },
 ]
 
 export default async function Home() {
@@ -17,7 +16,7 @@ export default async function Home() {
       <div className="header-inner">
         <Link className="brand" href="/" aria-label="Bunot-Bunot home"><ParolMark className="brand-mark" /><span>Bunot<span className="brand-dash">—</span>Bunot</span></Link>
         <nav className="main-nav" aria-label="Main navigation"><Link href="/">Home</Link><a href="#how-it-works">How it works</a><a href="#about">About</a></nav>
-        <CreateSessionButton className="button button-small button-light" />
+        <Link className="button button-small button-light" href="/events/new">Online exchange <CalendarDays size={16}/></Link>
       </div>
     </header>
 
@@ -27,9 +26,9 @@ export default async function Home() {
           <div className="hero-copy">
             <p className="eyebrow"><span aria-hidden="true">✳</span> Paskong Pinoy edition</p>
             <h1 id="hero-title">Bring the glow of Pasko to your <em>bunutan.</em></h1>
-            <p className="hero-description">Gather your guest list, let the room hold its breath, and reveal one name at a time.</p>
-            <div className="hero-actions"><CreateSessionButton /><a className="text-link" href="#how-it-works">See how it works <ArrowDown aria-hidden="true" size={16} /></a></div>
-            <p className="hero-note"><span className="note-rule" /> No account. Just names, parols, and Pasko.</p>
+            <p className="hero-description">Bring your loved ones into one Christmas exchange, even when everyone is celebrating from somewhere different.</p>
+            <div className="hero-actions"><Link className="button button-light" href="/events/new">Start a Bunutan <CalendarDays size={18}/></Link><a className="text-link" href="#how-it-works">See how it works <ArrowDown aria-hidden="true" size={16} /></a></div>
+            <p className="hero-note"><span className="note-rule" /> No accounts. No group call. Just a little Pasko magic.</p>
             {lastSessionId && <Link className="resume-link" href={`/sessions/${lastSessionId}`}>Resume your last bunutan <ArrowUpRight size={15} /></Link>}
           </div>
           <div className="hero-art" aria-hidden="true">
@@ -42,13 +41,13 @@ export default async function Home() {
       </section>
 
       <section className="how-section" id="how-it-works" aria-labelledby="how-title">
-        <div className="section-heading"><p className="eyebrow eyebrow-dark"><span aria-hidden="true">✳</span> A little ritual, made easy</p><h2 id="how-title">From a list of names<br />to a room full of cheers.</h2><p className="section-intro">Keep the setup simple, so the best part can take center stage.</p></div>
+        <div className="section-heading"><p className="eyebrow eyebrow-dark"><span aria-hidden="true">✳</span> A little ritual, made easy</p><h2 id="how-title">From the first invite<br />to the big reveal.</h2><p className="section-intro">Keep the setup simple, so the best part can take center stage.</p></div>
         <ol className="steps-list">{steps.map(({ number, icon: Icon, title, description }) => <li className="step" key={number}><div className="step-topline"><span className="step-number">{number}</span><Icon className="step-icon" aria-hidden="true" size={22} strokeWidth={1.6} /></div><h3>{title}</h3><p>{description}</p></li>)}</ol>
       </section>
 
-      <section className="closing-cta" id="about" aria-labelledby="closing-title"><ParolMark className="closing-mark" /><div><p className="eyebrow"><span aria-hidden="true">✳</span> Let the good names roll</p><h2 id="closing-title">Ready to bring everyone into the moment?</h2></div><CreateSessionButton /></section>
+      <section className="closing-cta" id="about" aria-labelledby="closing-title"><ParolMark className="closing-mark" /><div><p className="eyebrow"><span aria-hidden="true">✳</span> Let the good names roll</p><h2 id="closing-title">Ready to bring everyone into the moment?</h2></div><Link className="button button-light" href="/events/new">Create an online exchange <ArrowUpRight size={16}/></Link></section>
     </main>
 
-    <footer className="site-footer"><Link className="brand footer-brand" href="/" aria-label="Bunot-Bunot home"><ParolMark className="brand-mark" /><span>Bunot<span className="brand-dash">—</span>Bunot</span></Link><p>A brighter little tradition for your Christmas gathering.</p><a href="#how-it-works">How it works <ArrowUpRight aria-hidden="true" size={14} /></a></footer>
+    <footer className="site-footer"><Link className="brand footer-brand" href="/" aria-label="Bunot-Bunot home"><ParolMark className="brand-mark" /><span>Bunot<span className="brand-dash">—</span>Bunot</span></Link><p>A brighter little tradition, wherever everyone celebrates.</p><a href="#how-it-works">How it works <ArrowUpRight aria-hidden="true" size={14} /></a></footer>
   </>
 }

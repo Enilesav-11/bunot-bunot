@@ -1,6 +1,6 @@
 # Project status
 
-**Phase:** public anonymous bunutan live; production backend verified
+**Phase:** online exchange workflow implemented locally; production migration and deployment pending
 
 **Updated:** 2026-11-23
 
@@ -12,11 +12,12 @@
 - Participant add/edit/remove/search, bulk paste and CSV import, duplicate-name identification, settings, draw history, CSV exports, and read-only projector display.
 - PostgreSQL drawing is server-controlled, transaction-safe, concurrency-safe, and protected by session capability checks, rate limits, RLS, and unique constraints.
 - All four migrations are applied to the active production Bunot Supabase project. Recovery-code rotation and the missing participant FK index are included.
+- Remote gift exchanges now support participant invitations and confirmations, optional wishlists, a locked roster, private one-to-one assignments, individual reveals, progress tracking, event deadlines, public read-only details, and link recovery.
 
 ## Verification
 
-- `npm run lint`, `npx tsc --noEmit`, `npm test` (4 tests), and `npm run build` pass.
-- `npx supabase test db`: 22 pgTAP assertions pass.
+- `npm run lint`, `npx tsc --noEmit`, `npm test` (6 tests), `npm run test:concurrency` (2 integration tests), and `npm run build` pass.
+- Clean scratch database applied all migrations. Online exchange tests pass 36 pgTAP assertions, including voided-round history, confirmed participant removal, link revocation, and a valid replacement round; existing session-security tests pass 22.
 - Local integration test passes session isolation, 20 concurrent unique draws, public projection, and recovery rotation.
 - Local browser smoke flow passed: create session, add duplicate names, draw all participants, and open the public display.
 - Hosted Supabase smoke transaction passed session isolation, 20 unique draws, completed-round/public projection checks, recovery-code rotation, old-code invalidation, and renewed management access. Temporary records were removed.
@@ -30,6 +31,8 @@
 The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot). Recovery work is published on `codex/production-recovery`; production now tracks `feat/anonymous-bunutan-platform` at `1bc352b`. GitHub's `app` and `database` checks passed on the recovery branch. Vercel Preview remains access-protected; production is public.
 
 The production Supabase project is active in the approved Free organization in Singapore. Hosted checks confirm RLS on all five application tables, no direct table privileges for `anon` or `authenticated`, and `service_role`-only execution for app RPCs. Health advisor is clean. Remaining RLS-without-policy notices are informational for the server-only RPC model; the two remaining unindexed-FK notices have existing leading-column indexes. Unused-index notices are expected on an empty project.
+
+The Supabase CLI has no management access token in this workspace, so the new migration could not be applied to production. The live site still returns 404 for `/events/new`, `/join`, and `/participant`. The production Vercel branch must not receive this feature code until that migration is applied; its RPCs and tables do not exist in the current production schema.
 
 `WARDROBE Production` remains `INACTIVE`. Supabase rejected the restore because the owner has reached the two-active-Free-project limit. No other project was paused and no paid plan was selected. Restoring requires a free active-project slot or owner approval for paid capacity.
 

@@ -1,6 +1,6 @@
 # Database schema
 
-**Status:** all four checked-in migrations are applied to the production Bunot Supabase project. The Vercel production connection is live and verified.
+**Status:** online gift-exchange migration is being verified locally before production application.
 
 ## Tables
 
@@ -12,6 +12,11 @@
 | `public.draw_round_participants` | Immutable per-round participant/name snapshot, linked to both the round and participant within the same session. |
 | `public.draw_results` | Round/session/participant, draw order, UUID request key, timestamp; unique participant, order, and request key per round. |
 | `private.rate_limits` | HMAC-derived key, scope, time window, and request count. Raw client addresses are not stored. |
+| `public.gift_assignment_rounds` | Per-event assignment history, state, participant count, and generation/completion times. |
+| `public.gift_assignments` | One giver and one unique recipient per round, same-session foreign keys, no-self check, and private reveal timestamp. |
+| `public.participant_wishlists` | Participant-owned optional preferences, visible only to that participant and their assigned giver after reveal. |
+
+Online sessions add deadlines, event time zone, event status, budget/instructions, and wishlist setting. Participants add pending/confirmed/declined/revoked state, invitation/participant token verifiers, and confirmation timestamps. The roster becomes immutable when locked.
 
 Tables use foreign keys, checks, and lookup indexes. Historical rows use restrictive foreign keys; the purge function deletes dependent data in order within its transaction.
 
@@ -29,5 +34,7 @@ RLS is enabled on every public table. Direct table access and function execution
 - `draw_bunutan_next` locks the round, returns an existing result for a repeated request key, otherwise selects and inserts a result atomically. Cryptographic selection uses 8 random bytes with rejection sampling to avoid modulo bias.
 - Recovery locks the session, replaces the management verifier, clears the one-time recovery verifier, and restores access. `rotate_bunutan_recovery_code` replaces the recovery verifier and invalidates the previous code.
 - `purge_expired_bunutan_sessions` removes sessions and dependent data once the 60-day recovery deadline passes, then clears old rate-limit buckets.
+- `generate_gift_assignments` locks the event, uses server-side cryptographic shuffle with bounded rejection and a randomized single-cycle fallback, validates full giver/recipient coverage, and commits the round atomically.
+- Participant RPCs lock in a consistent event-then-participant order. Invitation claims are single-use; reveals return one participant's assignment only after its release time.
 
 Local database verification passes 22 pgTAP checks. Hosted checks confirmed the production tables have RLS enabled, direct table access is unavailable to `anon` and `authenticated`, and application RPCs are `service_role` only. Hosted smoke tests passed session isolation, unique draws, public projection, and recovery-code rotation. Live Vercel checks passed unique draws, public projection, and refresh persistence. Temporary records were removed.
