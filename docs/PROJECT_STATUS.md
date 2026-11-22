@@ -22,7 +22,7 @@
 
 ## Hosting status
 
-The source is pushed to the private [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot) repository on `feat/anonymous-bunutan-platform`. No public URL exists and no production deployment has been claimed.
+The source is pushed to the public [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot) repository on `feat/anonymous-bunutan-platform`. No public URL exists and no production deployment has been claimed.
 
 Production setup is blocked in two places. Supabase rejected creation in the approved organization because its free-project limit is reached; existing unrelated projects were not changed. Vercel can read the `Enilesav` team, but its project-creation request returned `403 Forbidden`; no Vercel project or deployment exists. The Vercel CLI is not installed. Once hosting access is resolved, create the dedicated Supabase project, connect the GitHub repository to Vercel, configure `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET`, apply the migration, then verify the resulting HTTPS URL from an independent device.
 
