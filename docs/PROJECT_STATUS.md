@@ -1,6 +1,6 @@
 # Project status
 
-**Phase:** implementation complete; production setup blocked on hosting access
+**Phase:** public landing page deployed; production database connection pending
 **Updated:** 2026-11-22
 
 ## Implemented
@@ -22,9 +22,9 @@
 
 ## Hosting status
 
-The source is pushed to the public [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot) repository on `feat/anonymous-bunutan-platform`. No public URL exists and no production deployment has been claimed.
+The source is pushed to the public [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot) repository on `feat/anonymous-bunutan-platform`. The public Vercel URL https://bunot-bunot-lemon.vercel.app returns HTTP 200 and serves the Bunot landing page; database-backed session creation and drawing have not been verified.
 
-The Supabase production project is created in the approved free organization in Singapore. `WARDROBE Production` was paused at the user's direction to free a project slot. Both migrations are applied; the five public application tables have RLS enabled, and all 12 RPCs are executable only by `service_role`. The security advisor's RLS-without-policies notice is expected for this server-only RPC design; performance advisories note three unindexed foreign keys and two unused indexes on the empty database. Vercel project `bunot-bunot` is connected to `Enilesav-11/bunot-bunot`, but production deployment is still pending identity verification. The local `.env.local` Supabase URL points to the local development API, not the hosted project. Production environment variables are not yet configured; then deploy and verify the HTTPS URL from an independent browser.
+The Supabase production project is active in the approved free organization in Singapore. `WARDROBE Production` was paused at the user's direction to free a project slot. Both migrations are applied; all five public application tables have RLS enabled, and all 12 RPCs are executable only by `service_role`. The security advisor's RLS-without-policies notice is expected for this server-only RPC design; performance advisories note three unindexed foreign keys and two unused indexes on the empty database. The local `.env.local` Supabase URL still points to the local development API. Configure `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel, then verify session creation and drawing on the public URL.
 
 ## Remaining checks
 
