@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** anonymous-session architecture and the production Supabase schema are in place. The public Vercel landing page is live; its session backend is not configured or verified.
+**Status:** anonymous-session architecture and the production Supabase schema are in place. The public Vercel landing page is live; its session backend has not been verified.
 
 ## Runtime and trust boundaries
 
@@ -29,6 +29,6 @@ The browser's latest session ID and the management capability are held in separa
 
 ## Deployment and verification
 
-The source is in the public GitHub repository and `https://bunot-bunot-lemon.vercel.app` serves the landing page. The active production Supabase project has all four checked-in migrations applied. Vercel Production still needs `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET`; do not claim the bunutan workflow is production-ready until it is deployed and verified.
+The source is in the public GitHub repository and `https://bunot-bunot-lemon.vercel.app` serves the landing page. The active production Supabase project has all four checked-in migrations applied. Confirm `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel Production; add any missing values. Do not claim the bunutan workflow is production-ready until it is deployed and verified.
 
 Verification: 22 pgTAP checks, a 20-request concurrent-draw integration test, lint, TypeScript, unit tests, and the production build pass locally. A hosted Supabase transaction smoke test passed 20 unique draws, session isolation, public projection, and recovery-code rotation; test data was removed. The website's database-backed workflow and cron execution are not verified through Vercel.

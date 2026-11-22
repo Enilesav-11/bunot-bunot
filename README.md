@@ -22,7 +22,7 @@ A public Paskong Pinoy bunutan. Visitors can create a session without an account
 
 ## Production setup
 
-The public site is at [bunot-bunot-lemon.vercel.app](https://bunot-bunot-lemon.vercel.app); its landing page responds, but Vercel is not yet connected to the production Supabase backend. The Bunot Supabase project is active and its checked-in migrations are applied. Add `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` to Vercel Production, then redeploy and verify session creation and drawing. Vercel's forwarded client-IP header is used for rate limits; on another host, set `TRUSTED_CLIENT_IP_HEADER` to a header overwritten by its trusted proxy. Never expose the service-role key to browser code or use a `NEXT_PUBLIC_` name.
+The public site is at [bunot-bunot-lemon.vercel.app](https://bunot-bunot-lemon.vercel.app); its landing page responds, but the production Supabase connection has not been verified. The Bunot Supabase project is active and its checked-in migrations are applied. Confirm `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel Production; add any missing values and redeploy before verifying session creation and drawing. Vercel's forwarded client-IP header is used for rate limits; on another host, set `TRUSTED_CLIENT_IP_HEADER` to a header overwritten by its trusted proxy. Never expose the service-role key to browser code or use a `NEXT_PUBLIC_` name.
 
 The source is in the public [GitHub repository](https://github.com/Enilesav-11/bunot-bunot). See `docs/PROJECT_STATUS.md` and `docs/PRODUCTION_RECOVERY.md` for verified status and remaining setup.
 

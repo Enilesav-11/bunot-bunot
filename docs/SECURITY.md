@@ -1,6 +1,6 @@
 # Security
 
-**Status:** production Supabase schema and grants are verified. Vercel secrets and the website's live database connection are not verified.
+**Status:** production Supabase schema and grants are verified. Vercel secrets and the website's live database connection could not be inspected.
 
 ## Capability and public access
 

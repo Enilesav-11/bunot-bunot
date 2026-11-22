@@ -1,6 +1,6 @@
 # Project status
 
-**Phase:** public landing page live; production bunutan backend not connected through Vercel
+**Phase:** public landing page live; production bunutan backend not verified through Vercel
 
 **Updated:** 2026-11-22
 
@@ -30,7 +30,7 @@ GitHub's `app` and `database` checks passed on the published branch. Vercel prod
 
 The production Supabase project is active in the approved Free organization in Singapore. Hosted checks confirm RLS on all five application tables, no direct table privileges for `anon` or `authenticated`, and `service_role`-only execution for app RPCs. Health advisor is clean. Remaining RLS-without-policy notices are informational for the server-only RPC model; the two remaining unindexed-FK notices have existing leading-column indexes. Unused-index notices are expected on an empty project.
 
-Vercel Production still needs `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET`. The service-role key must be copied directly from Supabase to Vercel's sensitive environment-variable form; do not share or commit it. Redeploy after setting the variables.
+Confirm `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET` in Vercel Production. If any are missing, add them there; copy the service-role key directly from Supabase to Vercel's sensitive environment-variable form. Do not share or commit it. Redeploy after changing variables.
 
 `WARDROBE Production` remains `INACTIVE`. Supabase rejected the restore because the owner has reached the two-active-Free-project limit. No other project was paused and no paid plan was selected. Restoring requires a free active-project slot or owner approval for paid capacity.
 

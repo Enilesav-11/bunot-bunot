@@ -1,7 +1,7 @@
 # Production recovery
 
 **Updated:** 2026-11-22
-**Status:** hosted Supabase is ready and smoke-tested; Vercel's bunutan backend is not configured.
+**Status:** hosted Supabase is ready and smoke-tested; Vercel's bunutan backend is not verified.
 
 ## Confirmed state
 
@@ -29,7 +29,7 @@ Never put the service-role key in chat, source control, a `NEXT_PUBLIC_` variabl
 
 ## Remaining deployment steps
 
-1. In Vercel, confirm the linked repository and production branch. Add the four Production variables above through the sensitive environment-variable form.
+1. In Vercel, confirm the linked repository, production branch, and four Production variables above. Add any missing values through the sensitive environment-variable form.
 2. Redeploy the intended production branch.
 3. From an independent browser, create a bunutan, manage participants, draw all names, refresh, recover from a backup code, and open its public display. Confirm a second session cannot manage it.
 4. Verify HTTPS cookies, Vercel runtime logs, and the scheduled purge execution. Keep test data clearly named and remove it afterward.
