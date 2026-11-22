@@ -1,6 +1,6 @@
 # Architecture
 
-**Status:** anonymous-session architecture is implemented locally. No Git remote, production Supabase project, Vercel project, or public URL is configured; deployment remains outstanding.
+**Status:** anonymous-session architecture and the production Supabase schema are in place. The public Vercel landing page is live; its session backend is not configured or verified.
 
 ## Runtime and trust boundaries
 
@@ -25,10 +25,10 @@ Each round snapshots participant IDs and names. The draw RPC locks the round, re
 
 ## Expiry and recovery
 
-The browser's latest session ID and the management capability are held in separate HttpOnly cookies; only the capability authorizes access. Management activity refreshes the 30-day idle expiry and 60-day recovery/purge deadline. Public reads do not extend either deadline. A recovery code can be used once to rotate management access without unarchiving a session. Rate limits apply per session and globally per HMAC-derived client key. The protected `/api/cron/purge` route calls the transactional database purge; `vercel.json` schedules it daily at 00:17 UTC. Expired sessions and their participants, snapshots, rounds, and results are removed after the recovery window.
+The browser's latest session ID and the management capability are held in separate HttpOnly cookies; only the capability authorizes access. Management activity refreshes the 30-day idle expiry and 60-day recovery/purge deadline. Public reads do not extend either deadline. A recovery code can be used once to rotate management access without unarchiving a session; owners can replace a saved recovery code, invalidating the previous one. Rate limits apply per session and globally per HMAC-derived client key. The protected `/api/cron/purge` route calls the transactional database purge; `vercel.json` schedules it daily at 00:17 UTC. Expired sessions and their participants, snapshots, rounds, and results are removed after the recovery window.
 
 ## Deployment and verification
 
-The local project is not publicly deployed. Production setup still needs a GitHub remote, production Supabase project with the migration applied, Vercel project, server environment variables (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, `CRON_SECRET`), and live-URL verification. Do not describe the app as deployed until that succeeds.
+The source is in the public GitHub repository and `https://bunot-bunot-lemon.vercel.app` serves the landing page. The active production Supabase project has all four checked-in migrations applied. Vercel Production still needs `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET`; do not claim the bunutan workflow is production-ready until it is deployed and verified.
 
-Local verification reported: 12 pgTAP database checks, a 20-request concurrent-draw integration test, and lint, type, unit, and production-build checks passed. This does not verify a remote database or deployment.
+Verification: 22 pgTAP checks, a 20-request concurrent-draw integration test, lint, TypeScript, unit tests, and the production build pass locally. A hosted Supabase transaction smoke test passed 20 unique draws, session isolation, public projection, and recovery-code rotation; test data was removed. The website's database-backed workflow and cron execution are not verified through Vercel.

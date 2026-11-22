@@ -1,5 +1,5 @@
 begin;
-select plan(19);
+select plan(22);
 
 select ok((select count(*) = 5 from pg_catalog.pg_tables where schemaname = 'public'
   and tablename in ('bunutan_sessions', 'participants', 'draw_rounds', 'draw_round_participants', 'draw_results')),
@@ -11,6 +11,9 @@ select ok((select bool_and(c.relrowsecurity) from pg_catalog.pg_class c
 select ok(not has_table_privilege('anon', 'public.participants', 'SELECT'), 'anonymous credentials have no roster table access');
 select ok(not has_table_privilege('anon', 'public.draw_results', 'SELECT'), 'anonymous credentials have no result table access');
 select ok(not has_function_privilege('anon', 'public.create_bunutan_session(text,text,text,text,text,text)', 'EXECUTE'), 'anonymous credentials cannot call management functions');
+select ok(not has_function_privilege('anon', 'public.rotate_bunutan_recovery_code(uuid,text,text,text)', 'EXECUTE'), 'anonymous credentials cannot rotate recovery codes');
+select ok(not has_function_privilege('authenticated', 'public.rotate_bunutan_recovery_code(uuid,text,text,text)', 'EXECUTE'), 'authenticated credentials cannot rotate recovery codes');
+select ok(has_function_privilege('service_role', 'public.rotate_bunutan_recovery_code(uuid,text,text,text)', 'EXECUTE'), 'only the server role can rotate recovery codes');
 
 select set_config('test.capability', repeat('a', 64), true);
 select set_config('test.rate_key', repeat('b', 64), true);

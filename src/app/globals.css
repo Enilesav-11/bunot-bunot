@@ -448,7 +448,7 @@ a:focus-visible { outline: 3px solid var(--ribbon); outline-offset: 4px; }
 @media (max-width: 850px) {
   .event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .workspace-grid { grid-template-columns: 1fr; }
-  .workspace-side { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .workspace-side { order: -1; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
   .workspace-side .presentation-link { grid-column: 1 / -1; }
   .workspace-side > form { align-self: end; }
   .recovery-notice { align-items: flex-start; flex-direction: column; }
@@ -467,14 +467,17 @@ a:focus-visible { outline: 3px solid var(--ribbon); outline-offset: 4px; }
   .workspace-side { grid-template-columns: 1fr; }
   .participant-row { grid-template-columns: minmax(0, 1fr) auto; padding: 6px 0; }
   .participant-row > .status-pill { display: none; }
-  .participant-edit { grid-column: 1 / -1; }
-  .participant-row > form:last-child { grid-column: 2; grid-row: 1; }
+  .participant-edit { grid-column: 1 / -1; grid-row: 1; }
+  .participant-row > .duplicate-note { grid-column: 1; grid-row: 2; justify-self: start; margin: 0 6px 7px; }
+  .participant-row > form:last-child { grid-column: 2; grid-row: 2; justify-self: end; }
   .round-list li { gap: 8px; font-size: .78rem; }
   .results-toolbar { align-items: stretch; flex-direction: column; }
   .results-toolbar > div { display: grid; grid-template-columns: 1fr 1fr; }
   .results-heading h1 { font-size: 2.8rem; }
   .results-table { min-width: 520px; }
   .presentation-page { padding: 19px 18px; }
+  .presentation-top { flex-wrap: wrap; }
+  .presentation-tools { flex-wrap: wrap; justify-content: flex-end; }
   .presentation-bottom { align-items: flex-start; flex-direction: column; }
 }
 @media print {

@@ -97,6 +97,29 @@ test('anonymous sessions isolate data and concurrent draws select each participa
       p_session_id: first.session_id, p_capability: newToken, p_rate_key: rateKey,
     })
     if (recoveredError || !recovered) throw recoveredError ?? new Error('Recovered session could not be read.')
+
+    const nextRecoveryCode = 'FEDC-BA98-7654-3210-ABCD'
+    const { error: rotateError } = await admin.rpc('rotate_bunutan_recovery_code', {
+      p_session_id: first.session_id, p_capability: newToken, p_rate_key: rateKey, p_recovery_hash: hash(nextRecoveryCode),
+    })
+    if (rotateError) throw rotateError
+    const { error: spentCodeError } = await admin.rpc('recover_bunutan_session', {
+      p_session_id: first.session_id, p_recovery_hash: hash(recoveryCode), p_management_hash: hash(randomBytes(32).toString('base64url')), p_rate_key: rateKey,
+    })
+    assert.ok(spentCodeError, 'Rotating a recovery code invalidates the prior code.')
+    const replacementToken = randomBytes(32).toString('base64url')
+    const { error: replacementError } = await admin.rpc('recover_bunutan_session', {
+      p_session_id: first.session_id, p_recovery_hash: hash(nextRecoveryCode), p_management_hash: hash(replacementToken), p_rate_key: rateKey,
+    })
+    if (replacementError) throw replacementError
+    const { error: rotatedTokenError } = await admin.rpc('get_bunutan_session', {
+      p_session_id: first.session_id, p_capability: newToken, p_rate_key: rateKey,
+    })
+    assert.ok(rotatedTokenError, 'A recovered token is invalidated by the next recovery.')
+    const { data: replacementSession, error: replacementReadError } = await admin.rpc('get_bunutan_session', {
+      p_session_id: first.session_id, p_capability: replacementToken, p_rate_key: rateKey,
+    })
+    if (replacementReadError || !replacementSession) throw replacementReadError ?? new Error('Replacement recovery could not read the session.')
   } finally {
     for (const id of createdIds) {
       await admin.from('draw_results').delete().eq('session_id', id)

@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation'
 import { Sparkles } from 'lucide-react'
 import { drawNext, type DrawReply } from '@/app/actions'
 
-export function DrawControl({ sessionId, roundId, remaining, complete }: { sessionId: string; roundId: string; remaining: number; complete: boolean }) {
+export function DrawControl({ sessionId, roundId, remaining, complete, initialResult }: { sessionId: string; roundId: string; remaining: number; complete: boolean; initialResult: NonNullable<DrawReply['result']> | null }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
-  const [reply, setReply] = useState<DrawReply | null>(null)
+  const [reply, setReply] = useState<DrawReply | null>(() => initialResult ? { error: '', result: initialResult } : null)
   const [requestKey, setRequestKey] = useState(() => crypto.randomUUID())
   const storageKey = `bunot-draw-${roundId}`
   function draw() {

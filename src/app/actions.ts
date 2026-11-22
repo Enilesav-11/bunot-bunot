@@ -10,12 +10,14 @@ import { createAdminClient } from '@/lib/supabase/admin'
 export type FormState = { error: string; message?: string }
 const fail = (message = 'Could not save that change. Please try again.'): FormState => ({ error: message })
 const clean = (value: FormDataEntryValue | null) => typeof value === 'string' ? value.trim() : ''
+const newRecoveryCode = () => randomBytes(10).toString('hex').toUpperCase().replace(/(.{4})/g, '$1-').replace(/-$/, '')
 
 export type CreateReply = { success: false; error: string } | { success: true; id: string; recoveryCode: string }
+export type RecoveryCodeReply = { success: false; error: string } | { success: true; recoveryCode: string }
 
 export async function createSession(): Promise<CreateReply> {
   const token = await createManagementToken()
-  const recoveryCode = randomBytes(10).toString('hex').toUpperCase().replace(/(.{4})/g, '$1-').replace(/-$/, '')
+  const recoveryCode = newRecoveryCode()
   try {
     const { data, error } = await createAdminClient().rpc('create_bunutan_session', {
       p_session_name: 'Christmas Party Bunutan', p_description: null,
@@ -26,6 +28,17 @@ export async function createSession(): Promise<CreateReply> {
     try { await setManagementCookie(data.session_id, token) } catch {}
     return { success: true, id: data.session_id as string, recoveryCode }
   } catch { return { success: false, error: 'Could not start your bunutan. Please try again.' } }
+}
+
+export async function rotateRecoveryCode(id: string): Promise<RecoveryCodeReply> {
+  if (!isUuid(id)) return { success: false, error: 'Refresh the page and try again.' }
+  const recoveryCode = newRecoveryCode()
+  try {
+    const { data, error } = await callManagement<boolean>(id, 'rotate_bunutan_recovery_code', { p_recovery_hash: hashSecret(recoveryCode) })
+    if (error || data !== true) return { success: false, error: 'Could not create a recovery backup. Try again.' }
+    revalidatePath(`/sessions/${id}`)
+    return { success: true, recoveryCode }
+  } catch { return { success: false, error: 'Could not create a recovery backup. Try again.' } }
 }
 
 export async function refreshSessionAccess(id: string) {

@@ -1,28 +1,28 @@
 # Security
 
-**Status:** anonymous-session controls are implemented locally. Production credentials, hosting, and remote security have not been configured or verified.
+**Status:** production Supabase schema and grants are verified. Vercel secrets and the website's live database connection are not verified.
 
 ## Capability and public access
 
-- Session management uses 32 cryptographically random bytes in a URL-safe token. The server stores only its SHA-256 verifier.
-- The raw token is carried in a session-specific `HttpOnly`, `SameSite=Strict` cookie (`Secure` in production; 30-day max age). It is not placed in a URL, client-readable storage, or management-action result.
-- Management operations validate the capability against the session verifier and check session status/expiry. Recovery accepts a separate 80-bit code once, rotates the management verifier, and clears the recovery verifier.
-- Public presentation uses an independent random public ID. Its server-rendered page calls a narrow projection function; it cannot manage the session or retrieve the roster. The RPC has no `anon` grant.
+- Each session uses a 32-byte random management token; only its SHA-256 verifier is stored.
+- The token is held in a session-specific HttpOnly, SameSite=Strict cookie (Secure in production), never a URL or browser-readable storage.
+- Recovery uses a separate one-time code. Recovery rotates the management verifier; code rotation invalidates the earlier recovery code.
+- A separate random public ID provides a narrow, read-only party projection. It cannot manage the session or read the participant roster.
 
 ## Server and database boundary
 
-`src/lib/supabase/admin.ts` is server-only and reads `SUPABASE_SERVICE_ROLE_KEY` from server environment. It disables persisted client auth state. Never move this key to a `NEXT_PUBLIC_` variable or browser bundle.
+`src/lib/supabase/admin.ts` is server-only and reads `SUPABASE_SERVICE_ROLE_KEY`. Never expose this value to browser code or use a `NEXT_PUBLIC_` variable.
 
-RLS is enabled on all public tables. Direct table and function privileges are revoked from `public`, `anon`, and `authenticated`; approved RPCs are granted to `service_role` only. Security-definer functions use an empty fixed `search_path` and qualified object names. The service-role boundary makes server-side capability validation essential: never add a route that accepts an unchecked session ID or bypasses the management RPCs.
+All five hosted public tables have RLS enabled. Direct table access is unavailable to `anon` and `authenticated`; the approved application RPCs are executable by `service_role` only. Security-definer functions use an empty fixed `search_path` and qualified names. Server-side capability checks remain mandatory for every management operation.
 
-Draws serialize on a row lock and commit the result with the round state. Rejection-sampled `pgcrypto` bytes avoid modulo bias; unique constraints prevent duplicate participants, positions, or request keys within a round. The request key makes retries return the committed result.
+Draws lock the round, use rejection-sampled `pgcrypto` randomness, and commit results transactionally. Unique constraints prevent duplicate participants and request positions within a round; request keys make retries idempotent.
 
 ## Rate limits and retention
 
-The server HMACs the forwarded client address with `RATE_LIMIT_SECRET`; only that derived key is stored. Database limits are 20 session creations per day, 240 management calls per minute per key globally plus 180 per session, 180 public calls per minute per key, and 20 recovery attempts per hour per key globally plus 8 per session. Production must run behind a trusted proxy that supplies the expected forwarding header.
+The server HMACs the trusted forwarded client address; only the derived key is stored. Limits cover session creation, management, public reads, and recovery. Vercel's forwarded client-IP header is used by default. Expired session data is purged by a bearer-protected endpoint scheduled daily in `vercel.json`.
 
-Management activity extends the 30-day idle expiry and 60-day recovery/purge deadline. Public reads do not extend them. A bearer-protected `/api/cron/purge` handler invokes database cleanup; Vercel schedules it daily. The production `CRON_SECRET` and schedule still require deployment configuration.
+## Verification and remaining risk
 
-## Verification and remaining work
+Local checks pass: 22 pgTAP assertions, 20-request concurrent drawing integration, lint, TypeScript, unit tests, and production build. Hosted Supabase smoke checks passed session isolation, 20 unique draws, public projection, recovery-code rotation, rejection of the old recovery code, and renewed management access; temporary test rows were removed. Health advisor is clean; the remaining RLS notices are informational because the app is server-only.
 
-Local verification reported 12 pgTAP checks, 20 concurrent draw requests without duplicate selections, and passing lint, type, unit, and build checks. No production database, deployment, or independent public-browser security check exists yet. Apply the migration to the production project and verify its grants, environment variables, HTTPS cookie behavior, cron authorization, session isolation, expiry, recovery, and live draw behavior before calling the service production-ready.
+The public URL currently serves the landing page, but Vercel's production environment variables are not verified. Session creation, HTTPS cookie behavior, scheduled cron execution, and live browser isolation remain unverified until Vercel is configured and redeployed.

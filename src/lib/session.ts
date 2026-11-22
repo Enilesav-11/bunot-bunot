@@ -61,7 +61,9 @@ export async function getBunutanSession(id: string): Promise<BunutanSession | nu
   const { data, error } = await createAdminClient().rpc('get_bunutan_session', {
     p_session_id: id, p_capability: token, p_rate_key: await rateKey(),
   })
-  return error ? null : data as BunutanSession
+  if (error?.code === 'P0002' && error.message === 'session_not_found') return null
+  if (error) throw new Error('Could not verify bunutan access.')
+  return data as BunutanSession | null
 }
 
 export async function getPublicBunotan(publicId: string): Promise<PublicBunutan | null> {

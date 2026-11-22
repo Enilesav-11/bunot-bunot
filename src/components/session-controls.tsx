@@ -3,7 +3,7 @@
 import { useActionState, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowUpRight, Copy, Download, KeyRound, Plus } from 'lucide-react'
-import { addParticipants, createSession, recoverSession, updateSession, type FormState } from '@/app/actions'
+import { addParticipants, createSession, recoverSession, rotateRecoveryCode, updateSession, type FormState, type RecoveryCodeReply } from '@/app/actions'
 
 const initial: FormState = { error: '' }
 
@@ -71,10 +71,25 @@ export function RecoveryForm({ id }: { id: string }) {
   const [state, action, pending] = useActionState(recoverSession.bind(null, id), initial)
   return <form className="app-form" action={action}>
     <label>Recovery code<input name="recovery_code" autoComplete="off" required placeholder="1234-ABCD-5678-EF90-1234" /></label>
-    <p className="field-hint">Enter the code from your downloaded backup. It works once and restores this bunutan on this browser.</p>
+    <p className="field-hint">Enter the code from your downloaded backup. It works once. After restoring access, create and save a fresh code before leaving this browser.</p>
     {state.error && <p className="form-message form-error" role="alert">{state.error}</p>}
     <button className="button button-primary" disabled={pending}>{pending ? 'Restoring…' : 'Restore access'} <KeyRound size={16} /></button>
   </form>
+}
+
+export function RecoveryCodeControl({ id }: { id: string }) {
+  const [result, setResult] = useState<RecoveryCodeReply | null>(null)
+  const [pending, startTransition] = useTransition()
+  function create() {
+    setResult(null)
+    startTransition(async () => setResult(await rotateRecoveryCode(id)))
+  }
+  return <div className="recovery-backup-control">
+    <p className="field-hint">Create a fresh one-time code after restoring access or if you need a new backup. Replacing it invalidates the previous code.</p>
+    {result?.success && <div className="recovery-card" role="status"><p className="eyebrow eyebrow-dark">SAVE YOUR NEW RECOVERY CODE</p><strong className="recovery-code">{result.recoveryCode}</strong><BackupButton id={id} code={result.recoveryCode} /></div>}
+    {result && !result.success && <p className="form-message form-error" role="alert">{result.error}</p>}
+    <button type="button" className="button button-outline" onClick={create} disabled={pending}>{pending ? 'Creating…' : result?.success ? 'Replace recovery code' : 'Create recovery code'} <KeyRound size={16} /></button>
+  </div>
 }
 
 export function ShareButton({ publicId }: { publicId: string }) {

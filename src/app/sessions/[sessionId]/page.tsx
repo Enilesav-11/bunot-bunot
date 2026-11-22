@@ -5,7 +5,7 @@ import { archiveSession, startRound } from '@/app/actions'
 import { DrawControl } from '@/components/draw-control'
 import { ParolMark } from '@/components/parol-mark'
 import { ParticipantList } from '@/components/participant-list'
-import { RecoveryForm, SessionEditor, ShareButton, ParticipantImportForm } from '@/components/session-controls'
+import { RecoveryForm, RecoveryCodeControl, SessionEditor, ShareButton, ParticipantImportForm } from '@/components/session-controls'
 import { ResultsTable } from '@/components/results-table'
 import { SessionKeepalive } from '@/components/session-keepalive'
 import { getBunutanSession, isUuid } from '@/lib/session'
@@ -22,6 +22,7 @@ export default async function SessionPage({ params, searchParams }: PageProps<'/
   const round = rounds.find((item) => item.status === 'in_progress') ?? rounds[0]
   const snapshotCount = round?.participant_count ?? active.length
   const remaining = round ? Math.max(0, snapshotCount - round.results.length) : active.length
+  const latestResult = round?.results[round.results.length - 1] ?? null
   const allResults = rounds.flatMap((item) => item.results.map((result) => ({ round: item.round_number, name: result.display_name, order: result.draw_order, drawnAt: result.drawn_at }))).sort((a, b) => a.round - b.round || a.order - b.order)
   const begin = startRound.bind(null, sessionId)
   const archive = archiveSession.bind(null, sessionId)
@@ -54,13 +55,14 @@ export default async function SessionPage({ params, searchParams }: PageProps<'/
         <aside className="workspace-side">
           <section className="section-card" id="drawing"><div className="card-heading"><div><p className="eyebrow eyebrow-dark">THE BIG REVEAL</p><h2>{round ? `Round ${round.round_number}` : 'Ready when you are'}</h2></div><Play className="card-heading-icon" size={22} /></div>
             {round ? <><div className="round-stats"><div><strong>{snapshotCount}</strong><span>Names in round</span></div><div><strong>{remaining}</strong><span>Still to draw</span></div><span className={`status-pill ${round.status === 'completed' ? 'status-complete' : 'status-active'}`}>{round.status === 'completed' ? 'Complete' : 'In progress'}</span></div>
-              {round.status === 'in_progress' && <DrawControl sessionId={sessionId} roundId={round.id} remaining={remaining} complete={false} />}
+              {round.status === 'in_progress' && <DrawControl sessionId={sessionId} roundId={round.id} remaining={remaining} complete={false} initialResult={latestResult} />}
               {round.status === 'completed' && <p className="last-result-note">Everyone has had their moment. Start another round whenever you’re ready.</p>}
             </> : <><p className="section-intro side-intro">Add the guest list, then draw a name at a time. Each person is selected only once per round.</p><form action={begin}><button className="button button-primary" disabled={!active.length || archived}><Play size={17} /> Start drawing</button></form></>}
             {round && <div className="round-links"><a href={`/p/${session.public_id}`} target="_blank" rel="noreferrer"><MonitorPlay size={16} /> Open party screen</a>{round.status === 'completed' && !archived && <form action={begin}><button className="quiet-button">Start another round →</button></form>}</div>}
           </section>
           <section className="section-card"><p className="eyebrow eyebrow-dark">SHARE THE PARTY DISPLAY</p><p className="field-hint">Anyone with this link can see the latest reveal and remaining count. It cannot change your bunutan.</p><ShareButton publicId={session.public_id} /></section>
           <section className="section-card"><p className="eyebrow eyebrow-dark">EVENT DETAILS</p>{archived ? <p className="page-intro">{session.description || 'No event note.'}</p> : <SessionEditor id={sessionId} name={session.session_name} description={session.description} />}<p className="expiry-note">This bunutan is kept until {new Date(session.expires_at).toLocaleDateString('en-PH', { dateStyle: 'long' })}. Activity extends its life.</p>{!archived && <form action={archive}><button className="archive-button">Archive this bunutan</button></form>}</section>
+          {!archived && <section className="section-card"><p className="eyebrow eyebrow-dark">SESSION RECOVERY</p><RecoveryCodeControl id={sessionId} /></section>}
         </aside>
       </div>
     </main>

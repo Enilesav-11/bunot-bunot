@@ -29,11 +29,12 @@ Actions on an existing session are bound to its ID and require the matching Http
 | `drawNext(id, roundId, requestKey)` | Requests the next server-selected result. A UUID request key makes retries idempotent; returns the saved result, remaining count, round status, and replay indicator. |
 | `archiveSession(id)` | Archives the session when no round is in progress. |
 | `recoverSession(id, state, form)` | Exchanges a valid one-time recovery code for a rotated management cookie. Recovery code format is five groups of four hexadecimal characters. |
+| `rotateRecoveryCode(id)` | Replaces the current recovery code; the previous code becomes invalid. |
 
 Action failures are returned as user-facing form/draw errors or handled by page redirects; Server Actions do not promise a separate REST status-code contract.
 
 ## Database functions
 
-The server calls `create_bunutan_session`, `get_bunutan_session`, `update_bunutan_session`, `add_bunutan_participants`, `update_bunutan_participant`, `remove_bunutan_participant`, `start_bunutan_round`, `draw_bunutan_next`, `get_public_bunutan`, `recover_bunutan_session`, `archive_bunutan_session`, and `purge_expired_bunutan_sessions`. All are granted to `service_role` only. Management functions receive the session capability internally; public presentation receives only the public ID and returns the approved projection.
+The server calls `create_bunutan_session`, `get_bunutan_session`, `update_bunutan_session`, `add_bunutan_participants`, `update_bunutan_participant`, `remove_bunutan_participant`, `start_bunutan_round`, `draw_bunutan_next`, `get_public_bunutan`, `recover_bunutan_session`, `rotate_bunutan_recovery_code`, `archive_bunutan_session`, and `purge_expired_bunutan_sessions`. All are granted to `service_role` only. Management functions receive the session capability internally; public presentation receives only the public ID and returns the approved projection.
 
-Production Supabase, Vercel credentials, and a public URL are not configured, so this document describes implemented local behavior rather than a live service contract.
+The public Vercel URL serves the landing page and the production Supabase schema is applied. Vercel's server credentials are not configured, so session actions and database-backed routes are not yet verified as a live service contract.
