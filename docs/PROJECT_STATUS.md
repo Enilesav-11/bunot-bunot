@@ -24,7 +24,7 @@
 
 ## Hosting and blockers
 
-The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot). Recovery work is published on `codex/production-recovery` at commit `af7d0b2`; the repository default remains `feat/anonymous-bunutan-platform`. Vercel settings, production environment variables, deployed branch, and deployed commit could not be inspected. The landing page responds, but no production session has been created through the website.
+The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot). Recovery work is published on `codex/production-recovery`; the repository default remains `feat/anonymous-bunutan-platform`. Vercel settings, production environment variables, deployed branch, and deployed commit could not be inspected. The landing page responds, but no production session has been created through the website.
 
 GitHub's `app` and `database` checks passed on the published branch. Vercel produced a Preview deployment, but the URL returns Vercel's login page without project authorization; it is not a public substitute for the production site.
 
