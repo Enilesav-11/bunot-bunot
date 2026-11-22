@@ -6,6 +6,7 @@
 ## Confirmed state
 
 - `https://bunot-bunot-lemon.vercel.app` serves the Bunot landing page (HTTP 200). The purge endpoint returns 401 without a bearer token, as intended. No live website bunutan has been run.
+- GitHub Actions `app` and `database` checks passed for the recovery branch. Vercel created a Preview deployment, but it shows a Vercel login screen to an unauthenticated visitor.
 - Supabase project `bunot-bunot` (`ipmwdrtjskihipaheuuo`) is `ACTIVE_HEALTHY` in the approved Free organization, Singapore. Four checked-in migrations are applied. All five app tables have RLS enabled, no direct table privileges for `anon` or `authenticated`, and app RPC execution is limited to `service_role`.
 - Hosted database smoke checks passed separate-session capability isolation, 20 participant inserts and unique draws, completed-round and public projection checks, recovery-code rotation, rejection of the old code, and renewed management access. The transaction removed all temporary records.
 - Health advisor is clean. RLS-without-policy notices are expected for the server-only RPC model. Two FK notices are covered by existing leading-column indexes; empty-project unused-index warnings do not indicate a workload issue.

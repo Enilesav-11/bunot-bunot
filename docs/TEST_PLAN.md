@@ -25,6 +25,7 @@
 
 - `https://bunot-bunot-lemon.vercel.app` responds with HTTP 200 and the Bunot landing page.
 - `/api/cron/purge` returns 401 without a valid bearer secret.
+- GitHub Actions `app` and `database` checks pass for the published recovery branch. Its Vercel Preview requires Vercel login and is not publicly accessible.
 - No live bunutan was created because Vercel's Supabase server credentials are not configured or accessible for verification.
 
 ## Not verified yet
@@ -32,4 +33,4 @@
 - Live session creation, drawing, recovery, refresh, public presentation, cross-browser isolation, and HTTPS cookies.
 - Actual Vercel cron execution and runtime logs.
 - Phone/tablet visual layout and projector fullscreen in an independent browser.
-- GitHub Actions result for commit `af7d0b2`.
+- Preview journey outside the Vercel-authenticated project context.

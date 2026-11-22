@@ -26,6 +26,8 @@
 
 The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot). Recovery work is published on `codex/production-recovery` at commit `af7d0b2`; the repository default remains `feat/anonymous-bunutan-platform`. Vercel settings, production environment variables, deployed branch, and deployed commit could not be inspected. The landing page responds, but no production session has been created through the website.
 
+GitHub's `app` and `database` checks passed on the published branch. Vercel produced a Preview deployment, but the URL returns Vercel's login page without project authorization; it is not a public substitute for the production site.
+
 The production Supabase project is active in the approved Free organization in Singapore. Hosted checks confirm RLS on all five application tables, no direct table privileges for `anon` or `authenticated`, and `service_role`-only execution for app RPCs. Health advisor is clean. Remaining RLS-without-policy notices are informational for the server-only RPC model; the two remaining unindexed-FK notices have existing leading-column indexes. Unused-index notices are expected on an empty project.
 
 Vercel Production still needs `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE_LIMIT_SECRET`, and `CRON_SECRET`. The service-role key must be copied directly from Supabase to Vercel's sensitive environment-variable form; do not share or commit it. Redeploy after setting the variables.
