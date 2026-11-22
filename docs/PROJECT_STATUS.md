@@ -24,7 +24,7 @@
 
 ## Hosting and blockers
 
-The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot), on `feat/anonymous-bunutan-platform`. This recovery work is not yet published. The Vercel settings, production environment variables, deployed branch, and deployed commit could not be inspected. The landing page responds, but no production session has been created through the website.
+The public source repository is [Enilesav-11/bunot-bunot](https://github.com/Enilesav-11/bunot-bunot). Recovery work is published on `codex/production-recovery` at commit `af7d0b2`; the repository default remains `feat/anonymous-bunutan-platform`. Vercel settings, production environment variables, deployed branch, and deployed commit could not be inspected. The landing page responds, but no production session has been created through the website.
 
 The production Supabase project is active in the approved Free organization in Singapore. Hosted checks confirm RLS on all five application tables, no direct table privileges for `anon` or `authenticated`, and `service_role`-only execution for app RPCs. Health advisor is clean. Remaining RLS-without-policy notices are informational for the server-only RPC model; the two remaining unindexed-FK notices have existing leading-column indexes. Unused-index notices are expected on an empty project.
 
@@ -37,4 +37,4 @@ Vercel Production still needs `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RATE
 - Configure Vercel production variables and redeploy the intended production branch.
 - Verify session creation, participant management, drawing, refresh, recovery, public sharing, isolation, and HTTPS cookies through the live website and an independent browser.
 - Confirm Vercel cron execution, production logs, and mobile/tablet presentation layouts.
-- Publish this recovery work to a non-production branch; avoid changing the production branch until Vercel variables are confirmed.
+- Confirm the Vercel environment variables and production branch before merging this recovery branch or changing the production deployment.

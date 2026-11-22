@@ -32,4 +32,4 @@
 - Live session creation, drawing, recovery, refresh, public presentation, cross-browser isolation, and HTTPS cookies.
 - Actual Vercel cron execution and runtime logs.
 - Phone/tablet visual layout and projector fullscreen in an independent browser.
-- GitHub Actions result for the current local changes.
+- GitHub Actions result for commit `af7d0b2`.
